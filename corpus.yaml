@@ -1,0 +1,122 @@
+# Granth demo corpus. `python scripts/download_corpus.py` fetches every entry into data/pdfs/,
+# verifies the page count with PyMuPDF, and writes data/pdfs/manifest.json + data/ATTRIBUTION.md.
+#
+# OpenStax entries resolve a fresh PDF URL (and the current license) from the OpenStax CMS API by
+# `openstax_title`; `urls` are tried first and act as a fallback if the API is unreachable.
+# archive.org entries are public-domain scans. Their PDFs carry archive.org's own OCR text layer,
+# so they are marked force_ocr: Granth ignores that layer and OCRs every page itself.
+
+min_pages: 200
+
+documents:
+  - id: biology-2e
+    filename: biology-2e.pdf
+    title: Biology 2e
+    authors: Mary Ann Clark, Matthew Douglas, Jung Choi (OpenStax)
+    source: openstax
+    openstax_title: Biology 2e
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/Biology-2e_-_WEB.pdf]
+
+  - id: chemistry-2e
+    filename: chemistry-2e.pdf
+    title: Chemistry 2e
+    authors: Paul Flowers, Klaus Theopold, Richard Langley, William R. Robinson (OpenStax)
+    source: openstax
+    openstax_title: Chemistry 2e
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/chemistry-2e_-_WEB.pdf]
+
+  - id: university-physics-1
+    filename: university-physics-vol1.pdf
+    title: University Physics Volume 1
+    authors: William Moebs, Samuel J. Ling, Jeff Sanny (OpenStax)
+    source: openstax
+    openstax_title: University Physics Volume 1
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/university-physics-volume-1_-_WEB.pdf]
+
+  - id: university-physics-2
+    filename: university-physics-vol2.pdf
+    title: University Physics Volume 2
+    authors: Samuel J. Ling, Jeff Sanny, William Moebs (OpenStax)
+    source: openstax
+    openstax_title: University Physics Volume 2
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/university-physics-volume-2_-_WEB.pdf]
+
+  - id: university-physics-3
+    filename: university-physics-vol3.pdf
+    title: University Physics Volume 3
+    authors: Samuel J. Ling, Jeff Sanny, William Moebs (OpenStax)
+    source: openstax
+    openstax_title: University Physics Volume 3
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/university-physics-volume-3_-_WEB.pdf]
+
+  - id: psychology-2e
+    filename: psychology-2e.pdf
+    title: Psychology 2e
+    authors: Rose M. Spielman, William J. Jenkins, Marilyn D. Lovett (OpenStax)
+    source: openstax
+    openstax_title: Psychology 2e
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/Psychology2e_WEB.pdf]
+
+  - id: principles-economics-3e
+    filename: principles-of-economics-3e.pdf
+    title: Principles of Economics 3e
+    authors: Steven A. Greenlaw, David Shapiro, Daniel MacDonald (OpenStax)
+    source: openstax
+    openstax_title: Principles of Economics 3e
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/principles-economics-3e_-_WEB.pdf]
+
+  - id: intro-sociology-3e
+    filename: introduction-to-sociology-3e.pdf
+    title: Introduction to Sociology 3e
+    authors: Tonja R. Conerly, Kathleen Holmes, Asha Lal Tamang (OpenStax)
+    source: openstax
+    openstax_title: Introduction to Sociology 3e
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/introduction-sociology-3e_-_WEB.pdf]
+
+  - id: calculus-1
+    filename: calculus-vol1.pdf
+    title: Calculus Volume 1
+    authors: Gilbert Strang, Edwin "Jed" Herman (OpenStax)
+    source: openstax
+    openstax_title: Calculus Volume 1
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/calculus-volume-1_-_WEB.pdf]
+
+  - id: microbiology
+    filename: microbiology.pdf
+    title: Microbiology
+    authors: Nina Parker, Mark Schneegurt, Anh-Hue Thi Tu, Philip Lister, Brian M. Forster (OpenStax)
+    source: openstax
+    openstax_title: Microbiology
+    urls: [https://assets.openstax.org/oscms-prodcms/media/documents/microbiology_-_WEB.pdf]
+
+  - id: principle-of-relativity-1920
+    filename: principle-of-relativity-1920_scanned.pdf
+    title: "The Principle of Relativity: Original Papers (1920)"
+    authors: A. Einstein, H. Minkowski; translated by M. N. Saha and S. N. Bose
+    source: archive.org
+    identifier: principleofrelat00eins
+    license: Public domain (published 1920; archive.org status NOT_IN_COPYRIGHT)
+    force_ocr: true
+    alternates: [einsteinstheoryo00born]
+
+  - id: first-studies-plant-life-1901
+    filename: first-studies-of-plant-life-1901_scanned.pdf
+    title: First Studies of Plant Life (1901)
+    authors: George Francis Atkinson
+    source: archive.org
+    identifier: cu31924089570380
+    license: Public domain (published 1901)
+    # Ingested through archive.org's existing OCR text layer (no re-OCR) to keep ingestion time down.
+    force_ocr: false
+    alternates: [practicalbotany00caverich]
+
+# Used only if fewer than one scanned document could be fetched (or with --synthetic):
+# rasterise pages of an OpenStax book at `dpi` into an image-only PDF.
+synthetic:
+  id: biology-2e-scanned-synthetic
+  filename: biology-2e_scanned_synthetic.pdf
+  title: Biology 2e — image-only synthetic scan (pp. 101-320)
+  from: biology-2e
+  first_page: 101
+  page_count: 220
+  dpi: 200

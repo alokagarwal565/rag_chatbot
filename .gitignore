@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+
+# Node / Frontend
+node_modules/
+dist/
+*.local
+npm-debug.log*
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# All local data: PDFs, SQLite, Chroma, model cache, attribution generated from corpus.yaml
+data/
+
+# Evaluation scratch runs (the final report.md / report.json are committed)
+evaluation/runs/
+
+# Model weights / caches
+*.onnx
+*.bin
+*.safetensors
+.cache/
+
+# Tooling
+.claude/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
