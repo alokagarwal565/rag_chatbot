@@ -37,3 +37,6 @@ evaluation/runs/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local-only presenter notes
+docs/DEMO.md
