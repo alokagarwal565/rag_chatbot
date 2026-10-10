@@ -43,7 +43,7 @@ def sample_chunks(store: Store, n: int, seed: int, min_ocr: int):
     rng = random.Random(seed)
     rows = store.conn.execute(
         """SELECT c.chunk_id, c.doc_id, c.page_start, c.page_end, c.text, c.has_ocr, c.token_count,
-                  d.filename, d.title, d.page_count
+                  d.filename, d.title, d.page_count, d.force_ocr
            FROM chunks c JOIN documents d USING (doc_id) WHERE d.status='done' AND c.token_count >= 250
            ORDER BY c.chunk_id""").fetchall()
     # Skip the first/last 4% of each book (front matter, index, references).
@@ -51,7 +51,8 @@ def sample_chunks(store: Store, n: int, seed: int, min_ocr: int):
     by_doc = {}
     for r in rows:
         by_doc.setdefault(r["filename"], []).append(r)
-    ocr_docs = sorted({r["filename"] for r in rows if r["has_ocr"]})
+    # Fully OCR'd (scanned) documents get guaranteed questions; stray OCR'd figure pages in textbooks don't.
+    ocr_docs = sorted({r["filename"] for r in rows if r["force_ocr"]})
     picks, used = [], set()
     for f in ocr_docs:  # guarantee questions whose answers live on OCR'd pages
         pool = [r for r in by_doc[f] if r["has_ocr"]]
@@ -78,6 +79,8 @@ async def main():
     ap.add_argument("--unanswerable", type=int, default=5)
     ap.add_argument("--seed", type=int, default=7)
     ap.add_argument("--min-ocr", type=int, default=3)
+    ap.add_argument("--tier", choices=["heavy", "fast"], default="heavy",
+                    help="Gemini tier used to write questions (fast when the heavy tier is out of quota)")
     args = ap.parse_args()
 
     store = Store()
@@ -89,7 +92,7 @@ async def main():
             break
         prompt = f"Book: {r['title']}\nPassage:\n\"\"\"\n{r['text']}\n\"\"\""
         try:
-            res = await llm.generate(prompt, GEN_SYSTEM, tier="heavy", max_tokens=400, json_mode=True, timeout=40)
+            res = await llm.generate(prompt, GEN_SYSTEM, tier=args.tier, max_tokens=400, json_mode=True, timeout=40)
             q = json.loads(res.text)
         except Exception as e:  # noqa: BLE001
             print(f"  skip {r['chunk_id']}: {e}")
@@ -105,6 +108,10 @@ async def main():
             "generated_by": res.model, "reviewed": False,
         })
         print(f"  {items[-1]['id']} {r['filename']} p.{r['page_start']}: {items[-1]['question']}")
+    if len(items) < args.answerable:
+        print(f"\nOnly {len(items)}/{args.answerable} answerable questions generated (LLM quota?); "
+              f"keeping the existing {OUT.name} unchanged.")
+        sys.exit(1)
     for i, q in enumerate(UNANSWERABLE[:args.unanswerable], start=1):
         items.append({"id": f"u{i:02d}", "question": q, "answerable": False, "reference_answer": None,
                       "gold_filename": None, "gold_page": None, "gold_pages": [], "gold_chunk_id": None,

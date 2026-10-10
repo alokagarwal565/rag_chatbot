@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     reranker_max_length: int = 256
 
     # Abstention gate: sigmoid(rerank logit) of the best chunk must reach this.
-    abstain_threshold: float = 0.002  # tuned on the eval set (evaluation/report.md, threshold sweep)
+    abstain_threshold: float = 0.05  # tuned on the full-corpus eval set (evaluation/report.md, threshold sweep)
     # Used when the reranker is disabled: best RRF score must reach this.
     rrf_abstain_threshold: float = 0.016
 
